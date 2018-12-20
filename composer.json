@@ -4,8 +4,7 @@
     "license": "MIT",
     "minimum-stability": "dev",
     "require": {
-        "php": ">=7.0",
-        "psr4/framework": "dev-master"
+        "php": ">=7.0"
     },
     "autoload": {
         "files": [
