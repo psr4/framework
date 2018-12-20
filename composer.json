@@ -7,8 +7,11 @@
         "php": ">=7.0"
     },
     "autoload": {
+        "files": [
+            "src/Common/helpers.php"
+        ],
         "psr-4": {
-            "Hll\\Foundation\\": "src/Foundation"
+            "Hll\\": "src/"
         }
     }
 }
