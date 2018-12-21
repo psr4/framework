@@ -34,17 +34,21 @@ class Kernel
 
     public function getClosure()
     {
-        $app = $this->app;
-        return function ($request) use ($app) {
+        return function ($request) {
             $module = $request->module();
             $controller = $request->controller();
             $action = $request->action();
-            $namespace = 'App\\' . ucfirst($module) . '\\Controller\\' . ucfirst($controller);
+            $namespace = $this->buildNameSpace($module, $controller);
             $this->app->bind($namespace);
             $controller = $this->app->make($namespace);
-            $result = $app->invokeMethod([$controller, $action]);
+            $result = $this->app->invokeMethod([$controller, $action]);
             $response = $this->app->make('response', $result);
             return $response;
         };
+    }
+
+    public function buildNameSpace($module, $controller)
+    {
+        return 'App\\' . ucfirst($module) . '\\Controller\\' . ucfirst($controller);
     }
 }
