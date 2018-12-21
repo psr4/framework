@@ -7,16 +7,9 @@ $app->bind(
     Hll\Contracts\Http\Kernel::class,
     App\Http\Kernel::class
 );
-// 助手函数绑定单类 必须使用bind
 $app->bind(App\Http\Kernel::class);
 $app->bind('response', \Hll\Http\Response::class);
-//$app->bind(
-//    'mysqli',
-//    function () {
-//        return new MySqli('localhost', 'root', 'root', 'test', '3306');
-//    },
-//    true
-//);
+
 $request = \Hll\Http\Request::capture();
 $app->instance('request', $request);
 $app->instance(\Hll\Http\Request::class, $request);
@@ -26,6 +19,16 @@ $kernel = $app->make(Hll\Contracts\Http\Kernel::class);
 $response = $kernel->handle($request);
 
 $response->send();
+
+// 容器测试
+
+//$app->bind(
+//    'mysqli',
+//    function () {
+//        return new MySqli('localhost', 'root', 'root', 'test', '3306');
+//    },
+//    true
+//);
 
 //$app->alias(
 //    'Test', 'mysqli'
