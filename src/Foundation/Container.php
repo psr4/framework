@@ -8,8 +8,188 @@
 
 namespace Hll\Foundation;
 
-
-class Container
+class Container implements \ArrayAccess
 {
+    protected static $instance = null;
 
+    public $bindings = [];
+
+    public $with = [];
+
+    public $alias = [];
+
+    public $instances = [];
+
+    public $resolved = [];
+
+    public function alias($alias, $abstract)
+    {
+        $this->alias[$alias] = $abstract;
+    }
+
+    public function isAlias($alias)
+    {
+        return array_key_exists($alias, $this->alias);
+    }
+
+    public function getAlias($alias)
+    {
+        return $this->alias[$alias];
+    }
+
+    public static function setInstance($instance)
+    {
+        return static::$instance = $instance;
+    }
+
+    public static function getInstance()
+    {
+        return static::$instance;
+    }
+
+    public function singleton($abstract, $concrete)
+    {
+        $this->bind($abstract, $concrete, true);
+    }
+
+    public function bind($abstract, $concrete = null, $isShare = false)
+    {
+        // 解绑已经绑定的
+        $this->unbind($abstract);
+
+        // 直接绑定类名
+        if (is_null($concrete)) {
+            $concrete = $abstract;
+        }
+
+        if (!$concrete instanceof \Closure) {
+            $concrete = $this->getClosure($abstract, $concrete);
+        }
+        $this->bindings[$abstract] = compact('concrete', 'isShare');
+    }
+
+    public function getClosure($abstract, $concrete)
+    {
+        return function ($container, $parameters = []) use ($abstract, $concrete) {
+            if ($abstract == $concrete) {
+                return $container->InvokeClass($concrete);
+            }
+            return $container->make($concrete, $parameters);
+        };
+    }
+
+    public function instance($abstract, $instance)
+    {
+        $this->instances[$abstract] = $instance;
+    }
+
+    public function unbind($abstract)
+    {
+        unset($this->bindings[$abstract]);
+    }
+
+    public function InvokeClass($concrete)
+    {
+        if (class_exists($concrete)) {
+            $reflector = new \ReflectionClass($concrete);
+            $construct = $reflector->getConstructor();
+            if (is_null($construct)) {
+                return $reflector->newInstance();
+            }
+            $parameter = $this->resolveParameter($construct);
+            return $reflector->newInstanceArgs($parameter);
+        }
+
+        return $concrete;
+    }
+
+    public function resolveParameter(\ReflectionMethod $method)
+    {
+        $parameters = $method->getParameters();
+        $result = [];
+        $with = $this->getLastWith();
+        foreach ($parameters as $parameter) {
+            $param_name = $parameter->getName();
+            if (array_key_exists($param_name, $with)) {
+                $result[] = $with[$param_name];
+                continue;
+            }
+            if (is_null($parameter->getClass())) {
+                $result[] = $param_name;
+            } else {
+                $result[] = $this->make($parameter->getClass()->getName());
+            }
+//            $param = $this->bound($param_name) ? $this->make();
+        }
+        return $result;
+    }
+
+
+    public function getLastWith()
+    {
+        return count($this->with) ? end($this->with) : [];
+    }
+
+    public function bound($abstract)
+    {
+        return isset($this->bindings[$abstract]) || isset($this->alias[$abstract]);
+    }
+
+    public function make($abstract, $parameter = [])
+    {
+        if ($this->isAlias($abstract)) {
+            return $this->make($this->getAlias($abstract), $parameter);
+        }
+        if (isset($this->instances[$abstract])) {
+            return $this->instances[$abstract];
+        }
+        $concrete = array_key_exists($abstract, $this->bindings) ? $this->bindings[$abstract]['concrete'] : $abstract;
+
+        $isShare = array_key_exists($abstract, $this->bindings) ? $this->bindings[$abstract]['isShare'] : false;
+
+        $this->with[] = $parameter;
+        // 绑定闭包函数
+        if ($concrete instanceof \Closure) {
+            $instance = $concrete($this, $parameter);
+        } else {
+            $instance = $this->InvokeClass($abstract);
+        }
+
+        array_pop($this->with);
+        if ($isShare) {
+            $this->resolved[$abstract] = true;
+            $this->instances[$abstract] = $instance;
+        }
+        return $instance;
+    }
+
+    public function __get($key)
+    {
+        return $this[$key];
+    }
+
+    public function __set($key, $value)
+    {
+        return $this[$key] = $value;
+    }
+
+    public function offsetExists($offset)
+    {
+        return $this->bound($offset);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->make($offset);
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        return $this->bind($offset, $value);
+    }
+
+    public function offsetUnset($offset)
+    {
+        return $this->unbind($offset);
+    }
 }
