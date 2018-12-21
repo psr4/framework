@@ -88,6 +88,19 @@ class Container implements \ArrayAccess
         unset($this->bindings[$abstract]);
     }
 
+    public function invokeMethod($method)
+    {
+        if (is_array($method)) {
+            $class = $method[0];
+            $method = $method[1];
+        } else {
+            $instance = null;
+        }
+        $reflector = new \ReflectionMethod($class, $method);
+        $parameter = $this->resolveParameter($reflector);
+        return $reflector->invokeArgs($class, $parameter);
+    }
+
     public function InvokeClass($concrete)
     {
         if (class_exists($concrete)) {
@@ -110,7 +123,7 @@ class Container implements \ArrayAccess
         $with = $this->getLastWith();
         foreach ($parameters as $parameter) {
             $param_name = $parameter->getName();
-            if (array_key_exists($param_name, $with)) {
+            if (is_array($with) && array_key_exists($param_name, $with)) {
                 $result[] = $with[$param_name];
                 continue;
             }

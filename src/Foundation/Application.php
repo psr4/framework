@@ -19,6 +19,7 @@ class Application extends Container
     {
         static::setInstance($this);
         $this->instance('app', $this);
+        $this->instance(Container::class, $this);
         $this->base_dir = $dir;
         $this->base_src = dirname(__FILE__);
         $this->initAlias();

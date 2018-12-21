@@ -8,10 +8,11 @@
 
 namespace App\Http;
 
-class Kernel implements \Hll\Contracts\Http\Kernel
-{
-    public function __construct(\ReflectionClass $reflectionClass ,$test)
-    {
+use App\Http\Middleware\Fitler;
 
-    }
+class Kernel extends \Hll\Contracts\Http\Kernel
+{
+    protected $middleware = [
+        Fitler::class
+    ];
 }
