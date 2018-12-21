@@ -16,6 +16,10 @@ class Request
     protected $get = [];
     protected $raw;
 
+    protected $module;
+    protected $controller;
+    protected $action;
+
     public static function getInstance()
     {
         if (static::$instance) {
@@ -23,7 +27,17 @@ class Request
         }
         $instance = new Static;
         static::$instance = $instance;
+
         return $instance;
+    }
+
+    public function __construct()
+    {
+        $r = $this->input('r');
+        $array = array_filter(explode('/', $r));
+        $this->module = isset($array[0]) ? $array[0] : 'index';
+        $this->controller = isset($array[1]) ? $array[1] : 'index';
+        $this->action = isset($array[2]) ? $array[2] : 'index';
     }
 
     public static function capture()
@@ -39,5 +53,20 @@ class Request
     public function input($key, $default = null)
     {
         return isset($this->input[$key]) ? $this->input[$key] : $default;
+    }
+
+    public function module()
+    {
+        return $this->module;
+    }
+
+    public function controller()
+    {
+        return $this->controller;
+    }
+
+    public function action()
+    {
+        return $this->action;
     }
 }
