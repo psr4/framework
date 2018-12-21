@@ -50,8 +50,11 @@ class Request
         return $request;
     }
 
-    public function input($key, $default = null)
+    public function input($key = null, $default = null)
     {
+        if (is_null($key)) {
+            return $this->input;
+        }
         return isset($this->input[$key]) ? $this->input[$key] : $default;
     }
 

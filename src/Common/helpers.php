@@ -12,3 +12,10 @@ if (!function_exists('app')) {
         }
     }
 }
+
+if (!function_exists('input')) {
+    function input($key, $value)
+    {
+
+    }
+}

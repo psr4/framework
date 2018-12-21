@@ -8,6 +8,7 @@
 
 namespace Hll\Foundation;
 
+use Hll\Facades\Request;
 use Hll\Facades\Test;
 use Hll\Provider\TestProvider;
 
@@ -29,7 +30,8 @@ class Application extends Container
     public function initAlias()
     {
         foreach ([
-                     '\Test' => Test::class
+                     '\Test' => Test::class,
+                     '\Request' => Request::class
                  ] as $alias => $class) {
             class_alias($class, $alias);
         }

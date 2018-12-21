@@ -14,6 +14,9 @@ $request = \Hll\Http\Request::capture();
 $app->instance('request', $request);
 $app->instance(\Hll\Http\Request::class, $request);
 
+
+var_dump(\Request::input());
+die();
 $kernel = $app->make(Hll\Contracts\Http\Kernel::class);
 
 $response = $kernel->handle($request);
