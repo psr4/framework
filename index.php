@@ -10,15 +10,9 @@ $app->bind(
 $app->bind(App\Http\Kernel::class);
 $app->bind('response', \Hll\Http\Response::class);
 
-$request = \Hll\Http\Request::capture();
-$app->instance('request', $request);
-$app->instance(\Hll\Http\Request::class, $request);
+$request = \Hll\Http\Request::capture($app);
 
-
-var_dump(\Request::input());
-die();
 $kernel = $app->make(Hll\Contracts\Http\Kernel::class);
-
 $response = $kernel->handle($request);
 
 $response->send();

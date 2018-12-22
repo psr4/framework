@@ -40,13 +40,17 @@ class Request
         $this->action = isset($array[2]) ? $array[2] : 'index';
     }
 
-    public static function capture()
+    public static function capture($app)
     {
         $request = Static::getInstance();
         $request->get = $_GET;
         $request->post = $_POST;
         $request->input = array_merge($_GET, $_POST);
         $request->raw = file_get_contents('php://input');
+
+        $app->instance('request', $request);
+        $app->instance(\Hll\Http\Request::class, $request);
+
         return $request;
     }
 
