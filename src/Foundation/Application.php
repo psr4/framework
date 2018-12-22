@@ -16,6 +16,11 @@ class Application extends Container
 {
     private $base_dir;
 
+    public $alias = [
+        'Test' => Test::class,
+        'Request' => Request::class
+    ];
+
     public function __construct($dir)
     {
         static::setInstance($this);
@@ -29,11 +34,13 @@ class Application extends Container
 
     public function initAlias()
     {
-        foreach ([
-                     '\Test' => Test::class,
-                     '\Request' => Request::class
-                 ] as $alias => $class) {
-            class_alias($class, $alias);
+        spl_autoload_register([$this, 'load'], true, false);
+    }
+
+    public function load($name)
+    {
+        if (array_key_exists($name, $this->alias)) {
+            class_alias($this->alias[$name], $name);
         }
     }
 
