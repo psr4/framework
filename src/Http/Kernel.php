@@ -6,8 +6,7 @@
  * Time: 16:30
  */
 
-namespace Hll\Contracts\Http;
-
+namespace Hll\Http;
 use Hll\Foundation\Container;
 use Hll\Http\Request;
 

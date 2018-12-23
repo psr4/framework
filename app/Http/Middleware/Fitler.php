@@ -9,7 +9,7 @@
 namespace App\Http\Middleware;
 
 use Hll\Http\Request;
-use Hll\Middleware\Middleware;
+use Hll\Http\Middleware;
 
 class Fitler extends Middleware
 {

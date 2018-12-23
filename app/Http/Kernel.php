@@ -10,7 +10,7 @@ namespace App\Http;
 
 use App\Http\Middleware\Fitler;
 
-class Kernel extends \Hll\Contracts\Http\Kernel
+class Kernel extends \Hll\Http\Kernel
 {
     protected $middleware = [
         Fitler::class

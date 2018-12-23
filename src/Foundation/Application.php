@@ -8,28 +8,55 @@
 
 namespace Hll\Foundation;
 
-use Hll\Facades\Request;
-use Hll\Facades\Test;
-use Hll\Provider\TestProvider;
+use Hll\Config\Config;
 
 class Application extends Container
 {
     private $base_dir;
 
-    public $alias = [
-        'Test' => Test::class,
-        'Request' => Request::class
+    public $aliaClass = [
+    ];
+
+    public $baseProviders = [
+
     ];
 
     public function __construct($dir)
     {
+        $this->initInstance();
+        $this->initDir($dir);
+        $this->initConfig();
+        $this->initAlias();
+        $this->registerProvider();
+    }
+
+    public function initInstance()
+    {
         static::setInstance($this);
         $this->instance('app', $this);
         $this->instance(Container::class, $this);
+        $this->instance(Application::class, $this);
+    }
+
+    public function initDir($dir)
+    {
         $this->base_dir = $dir;
         $this->base_src = dirname(__FILE__);
-        $this->initAlias();
-        $this->registerProvider();
+        $this->base_config = $this->base_dir . '/config';
+        $this->base_app = $this->base_dir . '/app';
+        $this->base_public = $this->base_dir . '/public';
+    }
+
+    public function initConfig()
+    {
+        $app_config = require_once($this->base_config . '/app.php');
+
+        $this->aliaClass = array_merge($this->aliaClass, $app_config['alias']);
+        $this->baseProviders = array_merge($this->baseProviders, $app_config['providers']);
+
+        $this->bind('config', Config::class);
+        $this->bind(Config::class, Config::class);
+
     }
 
     public function initAlias()
@@ -39,16 +66,14 @@ class Application extends Container
 
     public function load($name)
     {
-        if (array_key_exists($name, $this->alias)) {
+        if (array_key_exists($name, $this->aliaClass)) {
             class_alias($this->alias[$name], $name);
         }
     }
 
     public function registerProvider()
     {
-        foreach ([
-                     TestProvider::class
-                 ] as $provider) {
+        foreach ($this->baseProviders as $provider) {
             (new $provider())->register($this);
         }
     }

@@ -6,7 +6,7 @@
  * Time: 17:06
  */
 
-namespace Hll\Middleware;
+namespace Hll\Http;
 
 
 class Middleware
