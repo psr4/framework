@@ -18,4 +18,9 @@ class Middleware
             return $this->handle($request, $baseClosure);
         };
     }
+
+    public function handle(Request $request, \Closure $closure)
+    {
+
+    }
 }

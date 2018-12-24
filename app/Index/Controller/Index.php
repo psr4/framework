@@ -14,6 +14,6 @@ class Index
 {
     public function index(Request $request)
     {
-        return $request->input('r');
+        return [1,2,3];
     }
 }

@@ -74,7 +74,7 @@ class Container implements \ArrayAccess
             if ($abstract == $concrete) {
                 return $container->InvokeClass($concrete);
             }
-            return $container->make($concrete, $parameters);
+            return is_string($concrete) || $concrete instanceof \Closure ? $container->make($concrete, $parameters) : $concrete;
         };
     }
 
@@ -112,7 +112,6 @@ class Container implements \ArrayAccess
             $parameter = $this->resolveParameter($construct);
             return $reflector->newInstanceArgs($parameter);
         }
-
         return $concrete;
     }
 
@@ -153,14 +152,15 @@ class Container implements \ArrayAccess
         if ($this->isAlias($abstract)) {
             return $this->make($this->getAlias($abstract), $parameter);
         }
+
         if (isset($this->instances[$abstract])) {
             return $this->instances[$abstract];
         }
         $concrete = array_key_exists($abstract, $this->bindings) ? $this->bindings[$abstract]['concrete'] : $abstract;
 
         $isShare = array_key_exists($abstract, $this->bindings) ? $this->bindings[$abstract]['isShare'] : false;
-
         $this->with[] = $parameter;
+
         // 绑定闭包函数
         if ($concrete instanceof \Closure) {
             $instance = $concrete($this, $parameter);

@@ -15,10 +15,7 @@ class Fitler extends Middleware
 {
     public function handle(Request $request, \Closure $closure)
     {
-        echo 'before';
         $response = $closure($request);
-
-        echo 'after';
         return $response;
     }
 }

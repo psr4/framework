@@ -7,8 +7,8 @@
  */
 
 namespace Hll\Http;
+
 use Hll\Foundation\Container;
-use Hll\Http\Request;
 
 class Kernel
 {
@@ -41,7 +41,7 @@ class Kernel
             $this->app->bind($namespace);
             $controller = $this->app->make($namespace);
             $result = $this->app->invokeMethod([$controller, $action]);
-            $response = $this->app->make('response', $result);
+            $response = $this->app->make('response', ['response' => $result]);
             return $response;
         };
     }
