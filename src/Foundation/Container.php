@@ -126,16 +126,16 @@ class Container implements \ArrayAccess
                 $result[] = $with[$param_name];
                 continue;
             }
-            if (is_null($parameter->getClass())) {
-                $result[] = $param_name;
-            } else {
+            if (!is_null($parameter->getClass())) {
                 $result[] = $this->make($parameter->getClass()->getName());
+            } elseif ($parameter->isDefaultValueAvailable()) {
+                $result[] = $parameter->getDefaultValue();
+            } else {
+                $result[] = $param_name;
             }
-//            $param = $this->bound($param_name) ? $this->make();
         }
         return $result;
     }
-
 
     public function getLastWith()
     {
@@ -144,7 +144,7 @@ class Container implements \ArrayAccess
 
     public function bound($abstract)
     {
-        return isset($this->bindings[$abstract]) || isset($this->alias[$abstract]);
+        return isset($this->bindings[$abstract]) || isset($this->alias[$abstract]) || isset($this->instances[$abstract]);
     }
 
     public function make($abstract, $parameter = [])

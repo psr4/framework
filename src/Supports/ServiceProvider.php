@@ -11,7 +11,27 @@ namespace Hll\Supports;
 
 use Hll\Foundation\Container;
 
-interface ServiceProvider
+class ServiceProvider
 {
-    public function register(Container $container);
+    public $delay = false;
+
+    public function register(Container $container)
+    {
+
+    }
+
+    public function when()
+    {
+        return [];
+    }
+
+    public function providers()
+    {
+        return [];
+    }
+
+    public function isDelay()
+    {
+        return $this->delay;
+    }
 }

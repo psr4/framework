@@ -14,8 +14,9 @@ if (!function_exists('app')) {
 }
 
 if (!function_exists('input')) {
-    function input($key, $value)
+    function input($key = null, $value = null)
     {
-
+        $result = \Hll\Facades\Request::input($key);
+        return !is_null($result) ? $result : $value;
     }
 }

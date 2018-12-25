@@ -12,8 +12,6 @@ use Hll\Config\Config;
 
 class Application extends Container
 {
-    private $base_dir;
-
     public $aliaClass = [
     ];
 
@@ -23,11 +21,38 @@ class Application extends Container
 
     public function __construct($dir)
     {
+        $this->displayErrors();
         $this->initInstance();
         $this->initDir($dir);
         $this->initConfig();
         $this->initAlias();
         $this->registerProvider();
+    }
+
+    public function displayErrors()
+    {
+        error_reporting(-1);
+        set_error_handler([$this, 'errorHandle']);
+        set_exception_handler([$this, 'exceptionHandle']);
+        register_shutdown_function([$this, 'shutdownHandle']);
+    }
+
+    public function errorHandle($code, $message, $file, $line, $errors)
+    {
+        echo "code: {$code} ,<br> message: {$message},<br> file: {$file},<br> line: {$line}";
+    }
+
+    public function exceptionHandle($e)
+    {
+        echo "code: {$e->getCode()} ,<br> message: {$e->getMessage()},<br> file: {$e->getFile()},<br> line: {$e->getLine()}";
+    }
+
+    public function shutdownHandle()
+    {
+        if (!is_null($error = error_get_last())) {
+            echo 'shutdownHandle';
+            var_dump($error);
+        }
     }
 
     public function initInstance()
@@ -44,8 +69,8 @@ class Application extends Container
         $this->bind('path.root', $root_path);
         $this->bind('path.framework', dirname(__FILE__));
         $this->bind('path.config', $root_path . '/config');
-        $this->bind('path.base_app', $root_path . '/app');
-        $this->bind('path.base_public', $root_path . '/public');
+        $this->bind('path.app', $root_path . '/app');
+        $this->bind('path.public', $root_path . '/public');
     }
 
     public function initConfig()

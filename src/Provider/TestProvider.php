@@ -11,7 +11,7 @@ namespace Hll\Provider;
 use Hll\Foundation\Container;
 use Hll\Supports\ServiceProvider;
 
-class TestProvider implements ServiceProvider
+class TestProvider extends ServiceProvider
 {
     public function register(Container $container)
     {
