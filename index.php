@@ -2,9 +2,6 @@
 require 'vendor/autoload.php';
 
 $app = new Hll\Foundation\Application('./');
-var_dump('test');
-echo $app->make('test');
-die();
 $app->bind(
     Hll\Http\Kernel::class,
     App\Http\Kernel::class
@@ -41,6 +38,8 @@ $response->send();
 
 // 服务提供者测试
 //var_dump($app->Test->query('select * from ad')->fetch_all(MYSQLI_ASSOC));
+// 服务提供者懒加载
+//echo $app->make('test');
 
 // 别名测试
 //var_dump($app->make('Test'));
