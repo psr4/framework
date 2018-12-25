@@ -13,8 +13,15 @@ use Hll\Supports\ServiceProvider;
 
 class TestProvider extends ServiceProvider
 {
+    public $delay = true;
+
     public function register(Container $container)
     {
-        
+        $container->bind('test', '123');
+    }
+
+    public function providers()
+    {
+        return ['test'];
     }
 }

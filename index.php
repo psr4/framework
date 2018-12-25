@@ -2,7 +2,9 @@
 require 'vendor/autoload.php';
 
 $app = new Hll\Foundation\Application('./');
-
+var_dump('test');
+echo $app->make('test');
+die();
 $app->bind(
     Hll\Http\Kernel::class,
     App\Http\Kernel::class

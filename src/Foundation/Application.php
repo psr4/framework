@@ -71,6 +71,7 @@ class Application extends Container
         $this->bind('path.config', $root_path . '/config');
         $this->bind('path.app', $root_path . '/app');
         $this->bind('path.public', $root_path . '/public');
+        $this->bind('path.runtime', $root_path . '/runtime');
     }
 
     public function initConfig()
@@ -102,8 +103,60 @@ class Application extends Container
 
     public function registerProvider()
     {
-        foreach ($this->baseProviders as $provider) {
-            (new $provider())->register($this);
+        $cache = $this->loadCacheProvider();
+        if (is_null($cache) || !isset($cache['providers']) || $cache['providers'] != $this->baseProviders) {
+            $cache = $this->makeCacheProvider($this->baseProviders);
         }
+        $this->providerCache = $cache;
+        foreach ($cache['dependency'] as $provider) {
+            $this->loadProvider($provider);
+        }
+    }
+
+    public function makeCacheProvider($providers)
+    {
+        $array = [
+            'providers' => $providers,
+            'delay' => [],
+            'dependency' => [],
+            'alias' => []
+        ];
+
+        foreach ($providers as $provider) {
+            $instance = new $provider();
+
+            $isDelay = $instance->isDelay();
+
+            if ($isDelay) {
+                $array['delay'][] = $provider;
+            } else {
+                $array['dependency'][] = $provider;
+            }
+
+            $alias = $instance->providers();
+            foreach ($alias as $k => $v) {
+                $array['alias'][$v] = $provider;
+            }
+        }
+        $this->writeCacheProvider($array);
+        return $array;
+    }
+
+    public function writeCacheProvider($content)
+    {
+        is_dir($this->make('path.runtime')) || mkdir($this->make('path.runtime'), 0777);
+        $file_name = $this->make('path.runtime') . '/providers.php';
+        $data = '<?php return ' . var_export($content, true) . ';';
+        file_put_contents($file_name, $data);
+    }
+
+    public function loadCacheProvider()
+    {
+        $file_name = $this->make('path.runtime') . '/providers.php';
+
+        if (!is_file($file_name)) {
+            return null;
+        }
+        return include_once($file_name);
     }
 }

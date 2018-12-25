@@ -112,7 +112,23 @@ class Container implements \ArrayAccess
             $parameter = $this->resolveParameter($construct);
             return $reflector->newInstanceArgs($parameter);
         }
+        if ($this->isDelay($concrete)) {
+            $this->loadProvider($this->providerCache['alias'][$concrete]);
+        }
+
         return $concrete;
+    }
+
+    public $providerCache = [];
+
+    public function isDelay($concrete)
+    {
+        return isset($this->providerCache['alias']) && array_key_exists($concrete, $this->providerCache['alias']);
+    }
+
+    public function loadProvider($provider)
+    {
+        (new $provider())->register($this);
     }
 
     public function resolveParameter(\ReflectionMethod $method)
@@ -156,6 +172,7 @@ class Container implements \ArrayAccess
         if (isset($this->instances[$abstract])) {
             return $this->instances[$abstract];
         }
+
         $concrete = array_key_exists($abstract, $this->bindings) ? $this->bindings[$abstract]['concrete'] : $abstract;
 
         $isShare = array_key_exists($abstract, $this->bindings) ? $this->bindings[$abstract]['isShare'] : false;
