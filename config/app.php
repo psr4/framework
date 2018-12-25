@@ -11,6 +11,6 @@ return [
         'Request' => \Hll\Http\Request::class
     ],
     'providers' => [
-        \Hll\Provider\TestProvider::class
+        \App\Provider\TestProvider::class
     ]
 ];
