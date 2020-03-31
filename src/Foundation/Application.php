@@ -9,14 +9,20 @@
 namespace Hll\Foundation;
 
 use Hll\Config\Config;
+use Hll\Http\Request;
+use Hll\Http\Response;
 
 class Application extends Container
 {
-    public $aliaClass = [
+    private $aliaClass = [
     ];
 
-    public $baseProviders = [
+    private $baseProviders = [
+    ];
 
+    private $serviceProviders = [
+        'request' => Request::class,
+        'response' => Response::class
     ];
 
     public function __construct($dir)
@@ -81,11 +87,8 @@ class Application extends Container
             $app_config = require_once($app_config_file);
             $this->aliaClass = array_merge($this->aliaClass, $app_config['alias']);
             $this->baseProviders = array_merge($this->baseProviders, $app_config['providers']);
-            $this->bind('config', Config::class);
-            $this->bind(Config::class, Config::class);
-            $this->bind('app_config', function () use ($app_config) {
-                return $this->make('config', ['config' => $app_config]);
-            });
+            $config = new Config($app_config);
+            $this->bind('config', $config);
         }
     }
 
@@ -99,6 +102,35 @@ class Application extends Container
         if (array_key_exists($name, $this->aliaClass)) {
             class_alias($this->alias[$name], $name);
         }
+    }
+
+    public function run()
+    {
+        $this->registerServiceProviders();
+        $request = $this->initRequest();
+
+        $kernel = $this->make(\Hll\Http\Kernel::class);
+        $response = $kernel->handle($request);
+        return $response;
+    }
+
+    public function registerServiceProviders()
+    {
+        foreach ($this->serviceProviders as $k => $v) {
+            $this->bind($k, $v);
+        }
+    }
+
+    public function initRequest()
+    {
+        $request = $this->request;
+        $request->setGet($_GET);
+        $request->setPost($_POST);
+        $request->setRaw(file_get_contents('php://input'));
+
+        $this->instance('request', $request);
+        $this->instance(\Hll\Http\Request::class, $request);
+        return $request;
     }
 
     public function registerProvider()

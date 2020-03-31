@@ -57,11 +57,10 @@ class Container implements \ArrayAccess
         // 解绑已经绑定的
         $this->unbind($abstract);
 
-        // 直接绑定类名
         if (is_null($concrete)) {
             $concrete = $abstract;
         }
-
+        // 绑定类名
         if (!$concrete instanceof \Closure) {
             $concrete = $this->getClosure($abstract, $concrete);
         }

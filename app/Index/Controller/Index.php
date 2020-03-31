@@ -14,6 +14,7 @@ class Index
 {
     public function index(Request $request)
     {
-        return input();
+        var_dump(file_get_contents('php://input'));
+        return file_get_contents('php://input');
     }
 }

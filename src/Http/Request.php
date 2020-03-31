@@ -12,9 +12,9 @@ class Request
 {
     public static $instance = null;
 
-    protected $post = [];
-    protected $get = [];
-    protected $raw;
+    protected $post = null;
+    protected $get = null;
+    protected $raw = null;
 
     protected $module;
     protected $controller;
@@ -40,26 +40,26 @@ class Request
         $this->action = isset($array[2]) ? $array[2] : 'index';
     }
 
-    public static function capture($app)
-    {
-        $request = Static::getInstance();
-        $request->get = $_GET;
-        $request->post = $_POST;
-        $request->input = array_merge($_GET, $_POST);
-        $request->raw = file_get_contents('php://input');
-
-        $app->instance('request', $request);
-        $app->instance(\Hll\Http\Request::class, $request);
-
-        return $request;
-    }
-
     public function input($key = null, $default = null)
     {
         if (is_null($key)) {
             return $this->input;
         }
         return isset($this->input[$key]) ? $this->input[$key] : $default;
+    }
+
+    public function get()
+    {
+        if (is_null($this->get)) {
+            $this->get = $_GET;
+        }
+    }
+
+    public function post()
+    {
+        if (is_null($this->post)) {
+            $this->post = $_POST;
+        }
     }
 
     public function module()

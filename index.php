@@ -1,21 +1,7 @@
 <?php
 require 'vendor/autoload.php';
+$app = (new Hll\Foundation\Application('./'))->run()->send();
 
-$app = new Hll\Foundation\Application('./');
-$app->bind(
-    Hll\Http\Kernel::class,
-    App\Http\Kernel::class
-);
-
-$app->bind(App\Http\Kernel::class);
-$app->bind(\Hll\Http\Response::class);
-
-$app->bind('response', \Hll\Http\Response::class);
-$request = \Hll\Http\Request::capture($app);
-
-$kernel = $app->make(Hll\Http\Kernel::class);
-$response = $kernel->handle($request);
-$response->send();
 // 容器测试
 
 //$app->bind(

@@ -9,9 +9,9 @@
 namespace Hll\Config;
 
 
-class Config
+class Config implements \ArrayAccess
 {
-    public $config;
+    private $config;
 
     public function __construct($config = [])
     {
@@ -27,4 +27,25 @@ class Config
     {
         return $this->config[$key] = $value;
     }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->config[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->offsetExists($offset) ? $this->config[$offset] : null;
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->config[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->config[$offset]);
+    }
+
 }

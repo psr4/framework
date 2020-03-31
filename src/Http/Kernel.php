@@ -19,6 +19,7 @@ class Kernel
     public function __construct(Container $app)
     {
         $this->app = $app;
+        $this->middleware = $this->app->config['middleware'];
     }
 
     public function handle(Request $request)

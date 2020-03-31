@@ -12,5 +12,8 @@ return [
     ],
     'providers' => [
         \App\Provider\TestProvider::class
+    ],
+    'middleware' => [
+        \App\Http\Middleware\Filter::class
     ]
 ];

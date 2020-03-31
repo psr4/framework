@@ -11,7 +11,7 @@ namespace App\Http\Middleware;
 use Hll\Http\Request;
 use Hll\Http\Middleware;
 
-class Fitler extends Middleware
+class Filter extends Middleware
 {
     public function handle(Request $request, \Closure $closure)
     {
